@@ -36,7 +36,7 @@ void MainWindow::ReadEvents()
 	QJsonDocument json=QJsonDocument::fromJson(dataFile->readAll());
 	for (const QJsonValue object : json.array())
 	{
-		AddEvent(QDate::fromString(object.toObject().value(JSON_KEY_DATE).toString()),object.toObject().value(JSON_KEY_LABEL).toString());
+		AddEvent(QDate::fromString(object.toObject().value(JSON_KEY_DATE).toString(),DATE_FORMAT),object.toObject().value(JSON_KEY_LABEL).toString());
 	}
 }
 

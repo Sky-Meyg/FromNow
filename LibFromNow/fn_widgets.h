@@ -21,5 +21,15 @@ namespace FromNow
 	public:
 		EventBlock(QDate date,QString label,QWidget *parent=nullptr);
 	};
+
+	class LIBFROMNOWSHARED_EXPORT DateBlock : public QWidget
+	{
+	public:
+		DateBlock(QDate date,QWidget *parent=nullptr);
+	protected:
+		QLabel *month;
+		QLabel *day;
+		QLabel *year;
+	};
 }
 
