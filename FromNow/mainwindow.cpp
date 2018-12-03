@@ -4,19 +4,29 @@
 #include <QJsonObject>
 #include <QDate>
 #include <QVBoxLayout>
+#include <QCoreApplication>
+#include <QMessageBox>
 #include "mainwindow.h"
 #include "types.h"
 
 #include <QDebug>
 
-MainWindow::MainWindow(QWidget *parent)	: QMainWindow(parent), dataFile(nullptr), viewport(nullptr)
+MainWindow::MainWindow(QWidget *parent)	: QMainWindow(parent), viewport(nullptr)
 {
-	dataPath=QDir(QStandardPaths::writableLocation(QStandardPaths::AppDataLocation));
-	//if (!QDir::exists(dataPath)) QDir::mkdir(dataPath);
-	dataFile=new QFile(dataPath.filePath("fromnow.json"));
-	dataFile->open(QIODevice::ReadWrite);
+	connect(this,&MainWindow::Exit,qApp,&QCoreApplication::exit,Qt::QueuedConnection);
 
-	ReadEvents();
+	if (!FromNow::Event::Open(QStandardPaths::writableLocation(QStandardPaths::AppDataLocation)))
+	{
+		(new QMessageBox(QMessageBox::Critical,ERROR_CRITICAL,FromNow::Event::LastError(),QMessageBox::Ok,this))->exec();
+		emit Exit(FILE_ERROR);
+	}
+
+	if (!FromNow::Event::Read())
+	{
+		(new QMessageBox(QMessageBox::Critical,ERROR_CRITICAL,FromNow::Event::LastError(),QMessageBox::Ok,this))->exec();
+		emit Exit(PARSE_ERROR);
+	}
+
 	RefreshEvents();
 
 	createBar=new FromNow::CreateBar(this);
@@ -26,13 +36,7 @@ MainWindow::MainWindow(QWidget *parent)	: QMainWindow(parent), dataFile(nullptr)
 
 MainWindow::~MainWindow()
 {
-	delete dataFile;
-}
-
-void MainWindow::ReadEvents()
-{
-	QJsonDocument json=QJsonDocument::fromJson(dataFile->readAll());
-	for (const QJsonValue object : json.array()) FromNow::Event::Add(FromNow::Event(object.toObject()));
+	FromNow::Event::Close();
 }
 
 void MainWindow::RefreshEvents()
@@ -43,5 +47,6 @@ void MainWindow::RefreshEvents()
 
 void MainWindow::EventAdded(FromNow::Event event)
 {
+	FromNow::Event::Write();
 	RefreshEvents();
 }

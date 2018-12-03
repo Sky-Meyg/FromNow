@@ -14,11 +14,10 @@ public:
 	~MainWindow();
 protected:
 	FromNow::CreateBar *createBar;
-	QDir dataPath;
-	QFile *dataFile;
 	FromNow::ContentView *viewport;
-	void ReadEvents();
 	void RefreshEvents();
+signals:
+	void Exit(int code);
 protected slots:
 	void EventAdded(FromNow::Event event);
 };
