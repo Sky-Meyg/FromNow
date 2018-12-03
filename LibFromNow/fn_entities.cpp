@@ -25,12 +25,20 @@ namespace FromNow
 		return date.daysTo(QDate::currentDate());
 	}
 
+	quint64 Event::AbsoluteDays() const
+	{
+		if (Days() < 0)
+			return static_cast<quint64>(Days() * -1);
+		else
+			return static_cast<quint64>(Days());
+	}
+
 	QString Event::Detail() const
 	{
 		if (Days() < 0)
-			return QString("%1 days until").arg(QString::number(Days() * -1));
+			return QString("%1 days until").arg(QString::number(AbsoluteDays()));
 		else
-			return QString("%1 days since").arg(QString::number(Days()));
+			return QString("%1 days since").arg(QString::number(AbsoluteDays()));
 	}
 
 	void Event::Edit(quint32 id,const QString &label)
@@ -107,5 +115,11 @@ namespace FromNow
 			return false;
 		}
 		return true;
+	}
+
+	const EventList& Event::Events()
+	{
+		std::sort(events.begin(),events.end(),[](const Event &left,const Event &right) { return left.AbsoluteDays() < right.AbsoluteDays(); });
+		return events;
 	}
 }

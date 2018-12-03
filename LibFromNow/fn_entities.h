@@ -24,11 +24,12 @@ namespace FromNow
 		const QDate& Date() const { return date; }
 		const QString& Label() const { return label; }
 		qint64 Days() const;
+		quint64 AbsoluteDays() const;
 		QString Detail() const;
 		static void Add(Event event) { events.push_back(event); }
 		static void Edit(quint32 id,const QString &label);
 		static void Remove(Event &event);
-		static const EventList& Events() { return events; }
+		static const EventList& Events();
 		static bool Open(QString location);
 		static void Close();
 		static bool Read();
