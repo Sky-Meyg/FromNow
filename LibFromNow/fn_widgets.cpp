@@ -1,4 +1,5 @@
 #include <QBoxLayout>
+#include <QStackedLayout>
 #include <QFrame>
 #include "fn_widgets.h"
 
@@ -93,8 +94,28 @@ namespace FromNow
 		count->setStyleSheet("font-size: 20pt");
 		count->setAlignment(Qt::AlignCenter);
 		layout()->addWidget(count);
-		label=new QLabel(event.Label(),this);
-		label->setAlignment(Qt::AlignCenter);
+		label=new SecretEdit(event.Label(),this);
+		connect(label,&SecretEdit::Edited,[event](const QString label) {
+			Event::Edit(event.ID(),label);
+			Event::Write();
+		});
 		layout()->addWidget(label);
+	}
+
+	SecretEdit::SecretEdit(QString initialText,QWidget *parent) : QWidget(parent)
+	{
+		setLayout(new QStackedLayout(this));
+		label=new QPushButton(initialText,this);
+		label->setFlat(true);
+		connect(label,&QPushButton::clicked,[this]() { static_cast<QStackedLayout*>(layout())->setCurrentIndex(1); });
+		layout()->addWidget(label);
+		edit=new QLineEdit(initialText,this);
+		edit->setAlignment(Qt::AlignCenter);
+		connect(edit,&QLineEdit::editingFinished,[this]() {
+			static_cast<QStackedLayout*>(layout())->setCurrentIndex(0);
+			label->setText(edit->text());
+			emit Edited(edit->text());
+		});
+		layout()->addWidget(edit);
 	}
 }

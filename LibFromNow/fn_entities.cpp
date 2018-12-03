@@ -33,9 +33,15 @@ namespace FromNow
 			return QString("%1 days since").arg(QString::number(Days()));
 	}
 
+	void Event::Edit(quint32 id,const QString &label)
+	{
+		EventIterator candidate=std::find_if(events.begin(),events.end(),[&id](Event &candidate) { return candidate.ID() == id; });
+		if (candidate != events.end()) candidate->label=label;
+	}
+
 	void Event::Remove(Event &event)
 	{
-		EventIterator candidate=std::find_if(events.cbegin(),events.cend(),[&event](const Event &candidate) { return candidate.ID() == event.ID(); });
+		EventIteratorConst candidate=std::find_if(events.cbegin(),events.cend(),[&event](const Event &candidate) { return candidate.ID() == event.ID(); });
 		if (candidate != events.end()) events.erase(candidate);
 	}
 

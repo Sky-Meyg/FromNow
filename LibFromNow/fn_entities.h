@@ -12,7 +12,8 @@ namespace FromNow
 {
 	class LIBFROMNOWSHARED_EXPORT Event;
 	typedef std::vector<Event> EventList;
-	typedef std::vector<Event>::const_iterator EventIterator;
+	typedef std::vector<Event>::iterator EventIterator;
+	typedef std::vector<Event>::const_iterator EventIteratorConst;
 
 	class LIBFROMNOWSHARED_EXPORT Event
 	{
@@ -25,6 +26,7 @@ namespace FromNow
 		qint64 Days() const;
 		QString Detail() const;
 		static void Add(Event event) { events.push_back(event); }
+		static void Edit(quint32 id,const QString &label);
 		static void Remove(Event &event);
 		static const EventList& Events() { return events; }
 		static bool Open(QString location);

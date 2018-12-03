@@ -3,6 +3,7 @@
 #include <QToolBar>
 #include <QLabel>
 #include <QTextEdit>
+#include <QLineEdit>
 #include <QDate>
 #include <QCalendarWidget>
 #include <QScrollArea>
@@ -60,13 +61,29 @@ namespace FromNow
 		QLabel *year;
 	};
 
+	class LIBFROMNOWSHARED_EXPORT SecretEdit : public QWidget
+	{
+		Q_OBJECT
+	public:
+		SecretEdit(QString initialText,QWidget *parent=nullptr);
+		QString Text() const { return edit->text(); }
+	protected:
+		QPushButton *label;
+		QLineEdit *edit;
+	signals:
+		void Edited(const QString label);
+	};
+
 	class LIBFROMNOWSHARED_EXPORT DetailsBlock : public QWidget
 	{
+		Q_OBJECT
 	public:
 		DetailsBlock(const Event &event,QWidget *parent=nullptr);
 	protected:
 		QLabel *count;
-		QLabel *label;
+		SecretEdit *label;
+	signals:
+		void Edit(Event event);
 	};
 }
 
