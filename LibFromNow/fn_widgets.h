@@ -2,10 +2,11 @@
 
 #include <QToolBar>
 #include <QLabel>
-#include <QLineEdit>
+#include <QTextEdit>
 #include <QDate>
 #include <QCalendarWidget>
 #include <QScrollArea>
+#include <QPushButton>
 #include "fn_entities.h"
 #include "libfromnow_global.h"
 
@@ -13,11 +14,18 @@ namespace FromNow
 {
 	class LIBFROMNOWSHARED_EXPORT CreateBar : public QToolBar
 	{
+		Q_OBJECT
 	public:
 		CreateBar(QWidget *parent=nullptr);
 	protected:
 		QCalendarWidget *calendar;
-		QLineEdit *label;
+		QTextEdit *label;
+		QPushButton *addEvent;
+	signals:
+		void Add(Event event);
+	protected slots:
+		void AddClicked();
+		void TextChanged();
 	};
 
 	class LIBFROMNOWSHARED_EXPORT ContentView : public QScrollArea
@@ -25,7 +33,7 @@ namespace FromNow
 	public:
 		ContentView(QWidget *parent=nullptr);
 	protected:
-		QWidget *content;
+		QFrame *content;
 	};
 
 	class LIBFROMNOWSHARED_EXPORT EventBlock : public QWidget
@@ -37,7 +45,7 @@ namespace FromNow
 	class LIBFROMNOWSHARED_EXPORT DateBlock : public QWidget
 	{
 	public:
-		DateBlock(QDate date,QWidget *parent=nullptr);
+		DateBlock(const Event &event,QWidget *parent=nullptr);
 	protected:
 		QLabel *month;
 		QLabel *day;
@@ -46,7 +54,11 @@ namespace FromNow
 
 	class LIBFROMNOWSHARED_EXPORT DetailsBlock : public QWidget
 	{
-
+	public:
+		DetailsBlock(const Event &event,QWidget *parent=nullptr);
+	protected:
+		QLabel *count;
+		QLabel *label;
 	};
 }
 
