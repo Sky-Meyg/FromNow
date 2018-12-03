@@ -3,7 +3,6 @@
 #include <QMainWindow>
 #include <QFile>
 #include <QDir>
-#include <QScrollArea>
 #include "fn_widgets.h"
 
 class MainWindow : public QMainWindow
@@ -16,9 +15,7 @@ protected:
 	FromNow::CreateBar *createBar;
 	QDir dataPath;
 	QFile *dataFile;
-	QScrollArea *viewport;
-	QWidget *content;
-	void ReadEvents();
-	void AddEvent(QDate date,QString label);
+	FromNow::ContentView *viewport;
+	void RefreshEvents();
 };
 

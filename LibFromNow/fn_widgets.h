@@ -5,6 +5,8 @@
 #include <QLineEdit>
 #include <QDate>
 #include <QCalendarWidget>
+#include <QScrollArea>
+#include "fn_entities.h"
 #include "libfromnow_global.h"
 
 namespace FromNow
@@ -18,10 +20,18 @@ namespace FromNow
 		QLineEdit *label;
 	};
 
+	class LIBFROMNOWSHARED_EXPORT ContentView : public QScrollArea
+	{
+	public:
+		ContentView(QWidget *parent=nullptr);
+	protected:
+		QWidget *content;
+	};
+
 	class LIBFROMNOWSHARED_EXPORT EventBlock : public QWidget
 	{
 	public:
-		EventBlock(QDate date,QString label,QWidget *parent=nullptr);
+		EventBlock(const Event &event,QWidget *parent=nullptr);
 	};
 
 	class LIBFROMNOWSHARED_EXPORT DateBlock : public QWidget
@@ -32,6 +42,11 @@ namespace FromNow
 		QLabel *month;
 		QLabel *day;
 		QLabel *year;
+	};
+
+	class LIBFROMNOWSHARED_EXPORT DetailsBlock : public QWidget
+	{
+
 	};
 }
 

@@ -16,12 +16,20 @@ namespace FromNow
 		addWidget(label);
 	}
 
-	EventBlock::EventBlock(QDate date,QString label,QWidget *parent) : QWidget(parent)
+	ContentView::ContentView(QWidget *parent) : QScrollArea(parent), content(nullptr)
+	{
+		content=new QWidget(this);
+		content->setLayout(new QVBoxLayout(content));
+		for (const Event &event : Event::Events()) content->layout()->addWidget(new EventBlock(event,content));
+		setWidget(content);
+	}
+
+	EventBlock::EventBlock(const Event &event,QWidget *parent) : QWidget(parent)
 	{
 		setSizePolicy(QSizePolicy(QSizePolicy::Minimum,QSizePolicy::Fixed));
 		setLayout(new QHBoxLayout(this));
-		layout()->addWidget(new DateBlock(date,this));
-		layout()->addWidget(new QLabel(label,this));
+		layout()->addWidget(new DateBlock(event.Date(),this));
+		layout()->addWidget(new QLabel(event.Label(),this));
 	}
 
 	DateBlock::DateBlock(QDate date,QWidget *parent) : QWidget(parent)
