@@ -46,7 +46,12 @@ namespace FromNow
 		content=new QFrame(this);
 		content->setLayout(new QVBoxLayout(content));
 		content->setSizePolicy(QSizePolicy(QSizePolicy::MinimumExpanding,QSizePolicy::Fixed));
-		for (const Event &event : Event::Events()) content->layout()->addWidget(new EventBlock(event,content));
+		for (const Event &event : Event::Events())
+		{
+			EventBlock *eventBlock=new EventBlock(event,content);
+			connect(eventBlock,&EventBlock::Remove,this,&ContentView::Remove);
+			content->layout()->addWidget(eventBlock);
+		}
 		setWidget(content);
 	}
 
@@ -56,6 +61,9 @@ namespace FromNow
 		setLayout(new QHBoxLayout(this));
 		layout()->addWidget(new DateBlock(event,this));
 		layout()->addWidget(new DetailsBlock(event,this));
+		remove=new QPushButton("Remove",this);
+		connect(remove,&QPushButton::clicked,[this,event]() { emit Remove(event); });
+		layout()->addWidget(remove);
 	}
 
 	DateBlock::DateBlock(const Event &event,QWidget *parent) : QWidget(parent)

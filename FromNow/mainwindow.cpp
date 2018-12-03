@@ -42,11 +42,19 @@ MainWindow::~MainWindow()
 void MainWindow::RefreshEvents()
 {
 	viewport=new FromNow::ContentView(this); // not sure if this is a memory leak or not in Qt parent-owner-deleteLater-craziness framework
+	connect(viewport,&FromNow::ContentView::Remove,this,&MainWindow::EventRemoved);
 	setCentralWidget(viewport);
 }
 
 void MainWindow::EventAdded(FromNow::Event event)
 {
+	FromNow::Event::Write();
+	RefreshEvents();
+}
+
+void MainWindow::EventRemoved(FromNow::Event event)
+{
+	FromNow::Event::Remove(event);
 	FromNow::Event::Write();
 	RefreshEvents();
 }

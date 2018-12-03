@@ -30,16 +30,24 @@ namespace FromNow
 
 	class LIBFROMNOWSHARED_EXPORT ContentView : public QScrollArea
 	{
+		Q_OBJECT
 	public:
 		ContentView(QWidget *parent=nullptr);
 	protected:
 		QFrame *content;
+	signals:
+		void Remove(Event event);
 	};
 
 	class LIBFROMNOWSHARED_EXPORT EventBlock : public QWidget
 	{
+		Q_OBJECT
 	public:
 		EventBlock(const Event &event,QWidget *parent=nullptr);
+	protected:
+		QPushButton *remove;
+	signals:
+		void Remove(Event event);
 	};
 
 	class LIBFROMNOWSHARED_EXPORT DateBlock : public QWidget

@@ -20,5 +20,6 @@ signals:
 	void Exit(int code);
 protected slots:
 	void EventAdded(FromNow::Event event);
+	void EventRemoved(FromNow::Event event);
 };
 
