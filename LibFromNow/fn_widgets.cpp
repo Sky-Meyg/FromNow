@@ -38,6 +38,7 @@ namespace FromNow
 		Event event(calendar->selectedDate(),label->toPlainText());
 		Event::Add(event);
 		emit Add(event);
+		label->clear();
 	}
 
 	ContentView::ContentView(QWidget *parent) : QScrollArea(parent), content(nullptr)
