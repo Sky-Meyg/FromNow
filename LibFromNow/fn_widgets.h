@@ -4,6 +4,7 @@
 #include <QLabel>
 #include <QLineEdit>
 #include <QDate>
+#include <QCalendarWidget>
 #include "libfromnow_global.h"
 
 namespace FromNow
@@ -13,6 +14,7 @@ namespace FromNow
 	public:
 		CreateBar(QWidget *parent=nullptr);
 	protected:
+		QCalendarWidget *calendar;
 		QLineEdit *label;
 	};
 

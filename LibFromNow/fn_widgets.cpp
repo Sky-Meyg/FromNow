@@ -5,8 +5,14 @@ namespace FromNow
 {
 	CreateBar::CreateBar(QWidget *parent) : QToolBar(parent)
 	{
+		calendar=new QCalendarWidget(this);
+		calendar->setSizePolicy(QSizePolicy(QSizePolicy::Fixed,QSizePolicy::Fixed));
+		addWidget(calendar);
 		addWidget(new QLabel("Label",this));
 		label=new QLineEdit(this);
+		QSizePolicy labelPolicy=label->sizePolicy();
+		labelPolicy.setHorizontalStretch(2);
+		label->setSizePolicy(labelPolicy);
 		addWidget(label);
 	}
 
