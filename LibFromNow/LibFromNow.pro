@@ -17,3 +17,8 @@ unix {
     target.path = /usr/lib
     INSTALLS += target
 }
+
+win32 {
+	CONFIG += skip_target_version_ext
+	CONFIG -= debug_and_release debug_and_release_target
+}
