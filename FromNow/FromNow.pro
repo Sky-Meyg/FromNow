@@ -1,5 +1,5 @@
 QT       += core gui widgets
-TARGET = FromNow
+TARGET = fromnow
 TEMPLATE = app
 CONFIG += c++11
 
