@@ -82,7 +82,9 @@ namespace FromNow
 	bool Event::Read()
 	{
 		QJsonParseError jsonError;
-		QJsonDocument json=QJsonDocument::fromJson(dataFile.readAll(),&jsonError);
+		QByteArray data=dataFile.readAll();
+		if (data.isEmpty()) data="[]";
+		QJsonDocument json=QJsonDocument::fromJson(data,&jsonError);
 		if (json.isNull())
 		{
 			error=QString("Failed to extract JSON from data file: %1").arg(jsonError.errorString());
