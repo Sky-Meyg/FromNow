@@ -16,6 +16,7 @@ HEADERS += \
 unix {
 	target.path = /usr/lib
 	INSTALLS += target
+	QMAKE_CXXFLAGS += -Wno-covered-switch-default
 }
 
 win32 {
