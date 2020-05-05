@@ -63,8 +63,11 @@ namespace FromNow
 		setSizePolicy(QSizePolicy(QSizePolicy::MinimumExpanding,QSizePolicy::Fixed));
 		setLayout(new QHBoxLayout(this));
 		layout()->addWidget(new DateBlock(event,this));
-		layout()->addWidget(new UnitBlock(event,this));
-		layout()->addWidget(new DetailsBlock(event,this));
+		UnitBlock *unitBlock=new UnitBlock(event,this);
+		layout()->addWidget(unitBlock);
+		DetailsBlock *detailsBlock=new DetailsBlock(event,this);
+		layout()->addWidget(detailsBlock);
+		connect(unitBlock,&UnitBlock::Changed,detailsBlock,&DetailsBlock::UnitChanged);
 		remove=new QPushButton("Remove",this);
 		connect(remove,&QPushButton::clicked,[this,event]() { emit Remove(event); });
 		layout()->addWidget(remove);
@@ -99,20 +102,23 @@ namespace FromNow
 			throw std::logic_error("Unsupported units encountered when constructing unit block");
 		}
 
-		connect(days,&QRadioButton::toggled,[event](bool checked) {
+		connect(days,&QRadioButton::toggled,[this,eventID=event.ID()](bool checked) {
 			if (!checked) return;
-			Event::Edit(event.ID(),Units::DAYS);
+			Event::Edit(eventID,Units::DAYS);
 			Event::Write();
+			emit Changed(Units::DAYS);
 		});
-		connect(months,&QRadioButton::toggled,[event](bool checked) {
+		connect(months,&QRadioButton::toggled,[this,eventID=event.ID()](bool checked) {
 			if (!checked) return;
-			Event::Edit(event.ID(),Units::MONTHS);
+			Event::Edit(eventID,Units::MONTHS);
 			Event::Write();
+			emit Changed(Units::MONTHS);
 		});
-		connect(years,&QRadioButton::toggled,[event](bool checked) {
+		connect(years,&QRadioButton::toggled,[this,eventID=event.ID()](bool checked) {
 			if (!checked) return;
-			Event::Edit(event.ID(),Units::YEARS);
+			Event::Edit(eventID,Units::YEARS);
 			Event::Write();
+			emit Changed(Units::YEARS);
 		});
 	}
 
@@ -136,55 +142,13 @@ namespace FromNow
 
 	DetailsBlock::DetailsBlock(const Event &event,QWidget *parent) : QWidget(parent)
 	{
+		PrepareDescriptions(event);
 		setSizePolicy(QSizePolicy(QSizePolicy::MinimumExpanding,QSizePolicy::Fixed));
 		setLayout(new QVBoxLayout(this));
-		switch (event.Unit())
-		{
-			case Units::DAYS:
-			{
-				if (event.Days() < 0)
-					count=new QLabel(QString("%1 days until").arg(QString::number(event.AbsoluteCount(event.Days()))),this);
-				else
-					count=new QLabel(QString("%1 days since").arg(QString::number(event.AbsoluteCount(event.Days()))),this);
-				break;
-			}
-			case Units::MONTHS:
-			{
-				qint64 months=event.Months();
-				if (months == 0)
-				{
-					count=new QLabel("Less than a month until",this);
-					break;
-				}
-				if (months < 0)
-				{
-					count=new QLabel(QString("%1 months since").arg(QString::number(event.AbsoluteCount(event.Months()))),this);
-					break;
-				}
-				count=new QLabel(QString("%1 months until").arg(QString::number(event.AbsoluteCount(event.Months()))),this);
-				break;
-			}
-			case Units::YEARS:
-			{
-				qint64 years=event.Years();
-				if (years == 0)
-				{
-					count=new QLabel("Less than a year until",this);
-					break;
-				}
-				if (years < 0)
-				{
-					count=new QLabel(QString("%1 years since").arg(QString::number(event.AbsoluteCount(event.Years()))),this);
-					break;
-				}
-				count=new QLabel(QString("%1 years until").arg(QString::number(event.AbsoluteCount(event.Years()))),this);
-				break;
-			}
-			default:
-				throw std::logic_error("Unsupported unit encountered when constructing details block");
-		}
+		count=new QLabel(this);
 		count->setStyleSheet("font-size: 20pt");
 		count->setAlignment(Qt::AlignCenter);
+		UnitChanged(event.Unit());
 		layout()->addWidget(count);
 		label=new SecretEdit(event.Label(),this);
 		connect(label,&SecretEdit::Edited,[event](const QString label) {
@@ -192,6 +156,42 @@ namespace FromNow
 			Event::Write();
 		});
 		layout()->addWidget(label);
+	}
+
+	const QString DetailsBlock::DaysDescription(const Event &event) const
+	{
+		if (event.Days() < 0)
+			return QString("%1 days until").arg(QString::number(event.AbsoluteCount(event.Days())));
+		else
+			return QString("%1 days since").arg(QString::number(event.AbsoluteCount(event.Days())));
+	}
+
+	const QString DetailsBlock::MonthsDescription(const Event &event) const
+	{
+		qint64 months=event.Months();
+		if (months == 0) return "Less than a month until";
+		if (months < 0) return QString("%1 months since").arg(QString::number(event.AbsoluteCount(event.Months())));
+		return QString("%1 months until").arg(QString::number(event.AbsoluteCount(event.Months())));
+	}
+
+	const QString DetailsBlock::YearsDescription(const Event &event) const
+	{
+		qint64 years=event.Years();
+		if (years == 0) return "Less than a year until";
+		if (years < 0) return QString("%1 years since").arg(QString::number(event.AbsoluteCount(event.Years())));
+		return QString("%1 years until").arg(QString::number(event.AbsoluteCount(event.Years())));
+	}
+
+	void DetailsBlock::PrepareDescriptions(const Event &event)
+	{
+		descriptions.insert({Units::DAYS,DaysDescription(event)});
+		descriptions.insert({Units::MONTHS,MonthsDescription(event)});
+		descriptions.insert({Units::YEARS,YearsDescription(event)});
+	}
+
+	void DetailsBlock::UnitChanged(Units unit)
+	{
+		count->setText(descriptions.at(unit));
 	}
 
 	SecretEdit::SecretEdit(const QString &initialText,QWidget *parent) : QWidget(parent)

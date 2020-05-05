@@ -64,12 +64,15 @@ namespace FromNow
 
 	class LIBFROMNOWSHARED_EXPORT UnitBlock : public QWidget
 	{
+		Q_OBJECT
 	public:
 		UnitBlock(const Event &event,QWidget *parent=nullptr);
 	protected:
 		QRadioButton *days;
 		QRadioButton *months;
 		QRadioButton *years;
+	signals:
+		void Changed(Units unit);
 	};
 
 	class LIBFROMNOWSHARED_EXPORT SecretEdit : public QWidget
@@ -90,11 +93,19 @@ namespace FromNow
 		Q_OBJECT
 	public:
 		DetailsBlock(const Event &event,QWidget *parent=nullptr);
+		const QString DescribeRange(Units unit) const;
 	protected:
 		QLabel *count;
 		SecretEdit *label;
+		std::map<Units,QString> descriptions;
+		const QString DaysDescription(const Event &event) const;
+		const QString MonthsDescription(const Event &event) const;
+		const QString YearsDescription(const Event &event) const;
+		void PrepareDescriptions(const Event &event);
 	signals:
 		void Edit(Event event);
+	public slots:
+		void UnitChanged(Units unit);
 	};
 }
 
