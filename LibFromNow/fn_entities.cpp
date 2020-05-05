@@ -25,6 +25,18 @@ namespace FromNow
 		return date.daysTo(QDate::currentDate());
 	}
 
+	quint64 Event::Months() const
+	{
+		quint64 months=0;
+		QDate today=QDate::currentDate();
+		while (date.month() != today.month() || date.year() != today.year())
+		{
+			today=today.addMonths(1);
+			months++;
+		}
+		return months;
+	}
+
 	quint64 Event::AbsoluteDays() const
 	{
 		if (Days() < 0)
@@ -36,7 +48,7 @@ namespace FromNow
 	QString Event::Detail() const
 	{
 		if (Days() < 0)
-			return QString("%1 days until").arg(QString::number(AbsoluteDays()));
+			return QString("%1 days until (%2 months)").arg(QString::number(AbsoluteDays()),QString::number(Months()));
 		else
 			return QString("%1 days since").arg(QString::number(AbsoluteDays()));
 	}
