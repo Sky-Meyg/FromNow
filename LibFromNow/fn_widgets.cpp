@@ -96,7 +96,7 @@ namespace FromNow
 			years->setChecked(true);
 			break;
 		default:
-			throw std::logic_error("Unsupported units encountered when construction unit block");
+			throw std::logic_error("Unsupported units encountered when constructing unit block");
 		}
 	}
 
