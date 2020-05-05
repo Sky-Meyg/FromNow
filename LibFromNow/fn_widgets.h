@@ -65,7 +65,7 @@ namespace FromNow
 	class LIBFROMNOWSHARED_EXPORT UnitBlock : public QWidget
 	{
 	public:
-		UnitBlock(QWidget *parent=nullptr);
+		UnitBlock(const Event &event,QWidget *parent=nullptr);
 	protected:
 		QRadioButton *days;
 		QRadioButton *months;

@@ -37,7 +37,7 @@ namespace FromNow
 
 	void CreateBar::AddClicked()
 	{
-		Event event(calendar->selectedDate(),label->toPlainText());
+		Event event(calendar->selectedDate(),label->toPlainText(),Units::DAYS);
 		Event::Add(event);
 		emit Add(event);
 		label->clear();
@@ -63,14 +63,14 @@ namespace FromNow
 		setSizePolicy(QSizePolicy(QSizePolicy::MinimumExpanding,QSizePolicy::Fixed));
 		setLayout(new QHBoxLayout(this));
 		layout()->addWidget(new DateBlock(event,this));
-		layout()->addWidget(new UnitBlock(this));
+		layout()->addWidget(new UnitBlock(event,this));
 		layout()->addWidget(new DetailsBlock(event,this));
 		remove=new QPushButton("Remove",this);
 		connect(remove,&QPushButton::clicked,[this,event]() { emit Remove(event); });
 		layout()->addWidget(remove);
 	}
 
-	UnitBlock::UnitBlock(QWidget *parent) : QWidget(parent)
+	UnitBlock::UnitBlock(const Event &event,QWidget *parent) : QWidget(parent)
 	{
 		setSizePolicy(QSizePolicy(QSizePolicy::Fixed,QSizePolicy::Fixed));
 		setLayout(new QGridLayout(this));
@@ -83,6 +83,21 @@ namespace FromNow
 		years=new QRadioButton("Years",groupBox);
 		groupBox->layout()->addWidget(years);
 		layout()->addWidget(groupBox);
+
+		switch (event.Unit())
+		{
+		case Units::DAYS:
+			days->setChecked(true);
+			break;
+		case Units::MONTHS:
+			months->setChecked(true);
+			break;
+		case Units::YEARS:
+			years->setChecked(true);
+			break;
+		default:
+			throw std::logic_error("Unsupported units encountered when construction unit block");
+		}
 	}
 
 	DateBlock::DateBlock(const Event &event,QWidget *parent) : QWidget(parent)

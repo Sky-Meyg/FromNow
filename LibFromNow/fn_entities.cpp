@@ -18,6 +18,7 @@ namespace FromNow
 		id=QRandomGenerator::global()->generate();
 		date=QDate::fromString(data.value(JSON_KEY_DATE).toString(),DATE_FORMAT);
 		label=data.value(JSON_KEY_LABEL).toString();
+		unit=unitMap.at(data.value(JSON_KEY_UNIT).toString());
 	}
 
 	qint64 Event::Days() const

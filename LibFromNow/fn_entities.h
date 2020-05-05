@@ -6,6 +6,7 @@
 #include <QDir>
 #include <QFile>
 #include <vector>
+#include "fn_types.h"
 #include "libfromnow_global.h"
 
 namespace FromNow
@@ -18,11 +19,12 @@ namespace FromNow
 	class LIBFROMNOWSHARED_EXPORT Event
 	{
 	public:
-		Event(QDate date,QString label) : date(date), label(label) { }
+		Event(QDate date,QString label,Units unit) : date(date), label(label), unit(unit) { }
 		Event(QJsonObject data);
 		quint32 ID() const { return id; }
 		const QDate& Date() const { return date; }
 		const QString& Label() const { return label; }
+		Units Unit() const { return unit; }
 		qint64 Days() const;
 		quint64 Months() const;
 		quint64 AbsoluteDays() const;
@@ -40,6 +42,7 @@ namespace FromNow
 		quint32 id;
 		QDate date;
 		QString label;
+		Units unit;
 		static EventList events;
 		static QDir dataPath;
 		static QFile dataFile;

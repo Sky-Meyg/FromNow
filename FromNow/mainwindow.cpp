@@ -41,9 +41,21 @@ MainWindow::~MainWindow()
 
 void MainWindow::RefreshEvents()
 {
-	viewport=new FromNow::ContentView(this); // not sure if this is a memory leak or not in Qt parent-owner-deleteLater-craziness framework
-	connect(viewport,&FromNow::ContentView::Remove,this,&MainWindow::EventRemoved);
-	setCentralWidget(viewport);
+	try {
+		viewport=new FromNow::ContentView(this); // not sure if this is a memory leak or not in Qt parent-owner-deleteLater-craziness framework
+		connect(viewport,&FromNow::ContentView::Remove,this,&MainWindow::EventRemoved);
+		setCentralWidget(viewport);
+	}
+
+	catch (std::logic_error &exception) {
+		(new QMessageBox(QMessageBox::Critical,ERROR_CRITICAL,exception.what(),QMessageBox::Ok,this))->exec();
+		emit Exit(BUG);
+	}
+
+	catch (std::runtime_error &exception) {
+		(new QMessageBox(QMessageBox::Critical,ERROR_GENERAL,exception.what(),QMessageBox::Ok,this))->exec();
+		emit Exit(GENERAL_ERROR);
+	}
 }
 
 void MainWindow::EventAdded(FromNow::Event event)
