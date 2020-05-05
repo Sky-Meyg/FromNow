@@ -1,6 +1,7 @@
 #include <QBoxLayout>
 #include <QStackedLayout>
 #include <QFrame>
+#include <QGroupBox>
 #include "fn_widgets.h"
 
 namespace FromNow
@@ -62,10 +63,26 @@ namespace FromNow
 		setSizePolicy(QSizePolicy(QSizePolicy::MinimumExpanding,QSizePolicy::Fixed));
 		setLayout(new QHBoxLayout(this));
 		layout()->addWidget(new DateBlock(event,this));
+		layout()->addWidget(new UnitBlock(this));
 		layout()->addWidget(new DetailsBlock(event,this));
 		remove=new QPushButton("Remove",this);
 		connect(remove,&QPushButton::clicked,[this,event]() { emit Remove(event); });
 		layout()->addWidget(remove);
+	}
+
+	UnitBlock::UnitBlock(QWidget *parent) : QWidget(parent)
+	{
+		setSizePolicy(QSizePolicy(QSizePolicy::Fixed,QSizePolicy::Fixed));
+		setLayout(new QGridLayout(this));
+		QGroupBox *groupBox=new QGroupBox(this);
+		groupBox->setLayout(new QVBoxLayout(groupBox));
+		days=new QRadioButton("Days",groupBox);
+		groupBox->layout()->addWidget(days);
+		months=new QRadioButton("Months",groupBox);
+		groupBox->layout()->addWidget(months);
+		years=new QRadioButton("Years",groupBox);
+		groupBox->layout()->addWidget(years);
+		layout()->addWidget(groupBox);
 	}
 
 	DateBlock::DateBlock(const Event &event,QWidget *parent) : QWidget(parent)

@@ -8,6 +8,7 @@
 #include <QCalendarWidget>
 #include <QScrollArea>
 #include <QPushButton>
+#include <QRadioButton>
 #include "fn_entities.h"
 #include "libfromnow_global.h"
 
@@ -59,6 +60,16 @@ namespace FromNow
 		QLabel *month;
 		QLabel *day;
 		QLabel *year;
+	};
+
+	class LIBFROMNOWSHARED_EXPORT UnitBlock : public QWidget
+	{
+	public:
+		UnitBlock(QWidget *parent=nullptr);
+	protected:
+		QRadioButton *days;
+		QRadioButton *months;
+		QRadioButton *years;
 	};
 
 	class LIBFROMNOWSHARED_EXPORT SecretEdit : public QWidget
