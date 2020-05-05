@@ -169,17 +169,25 @@ namespace FromNow
 
 	const QString DetailsBlock::MonthsDescription(const Event &event) const
 	{
-		qint64 months=event.Months();
-		if (months == 0) return "Less than a month until";
-		if (months < 0) return QString("%1 months since").arg(QString::number(event.AbsoluteCount(event.Months())));
+		bool partial=event.AbsoluteCount(event.Days()) < static_cast<quint64>(QDate::currentDate().daysInMonth());
+		if (event.Days() < 0)
+		{
+			if (partial) return "Less than a month since";
+			return QString("%1 months since").arg(QString::number(event.AbsoluteCount(event.Months())));
+		}
+		if (partial) return "Less than a month until";
 		return QString("%1 months until").arg(QString::number(event.AbsoluteCount(event.Months())));
 	}
 
 	const QString DetailsBlock::YearsDescription(const Event &event) const
 	{
-		qint64 years=event.Years();
-		if (years == 0) return "Less than a year until";
-		if (years < 0) return QString("%1 years since").arg(QString::number(event.AbsoluteCount(event.Years())));
+		bool partial=event.AbsoluteCount(event.Days()) < static_cast<quint64>(QDate::currentDate().daysInYear());
+		if (event.Days() < 0)
+		{
+			if (partial) return "Less than a year since";
+			return QString("%1 years since").arg(QString::number(event.AbsoluteCount(event.Years())));
+		}
+		if (partial) return "Less than a year until";
 		return QString("%1 years until").arg(QString::number(event.AbsoluteCount(event.Years())));
 	}
 
