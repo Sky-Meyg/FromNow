@@ -23,7 +23,7 @@ namespace FromNow
 
 	qint64 Event::Days() const
 	{
-		return date.daysTo(QDate::currentDate());
+		return QDate::currentDate().daysTo(date);
 	}
 
 	qint64 Event::Months() const

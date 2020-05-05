@@ -161,9 +161,9 @@ namespace FromNow
 	const QString DetailsBlock::DaysDescription(const Event &event) const
 	{
 		if (event.Days() < 0)
-			return QString("%1 days until").arg(QString::number(event.AbsoluteCount(event.Days())));
-		else
 			return QString("%1 days since").arg(QString::number(event.AbsoluteCount(event.Days())));
+		else
+			return QString("%1 days until").arg(QString::number(event.AbsoluteCount(event.Days())));
 	}
 
 	const QString DetailsBlock::MonthsDescription(const Event &event) const
