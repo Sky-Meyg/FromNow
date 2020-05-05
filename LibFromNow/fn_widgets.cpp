@@ -138,7 +138,51 @@ namespace FromNow
 	{
 		setSizePolicy(QSizePolicy(QSizePolicy::MinimumExpanding,QSizePolicy::Fixed));
 		setLayout(new QVBoxLayout(this));
-		count=new QLabel(event.Detail(),this);
+		switch (event.Unit())
+		{
+			case Units::DAYS:
+			{
+				if (event.Days() < 0)
+					count=new QLabel(QString("%1 days until").arg(QString::number(event.AbsoluteCount(event.Days()))),this);
+				else
+					count=new QLabel(QString("%1 days since").arg(QString::number(event.AbsoluteCount(event.Days()))),this);
+				break;
+			}
+			case Units::MONTHS:
+			{
+				qint64 months=event.Months();
+				if (months == 0)
+				{
+					count=new QLabel("Less than a month until",this);
+					break;
+				}
+				if (months < 0)
+				{
+					count=new QLabel(QString("%1 months since").arg(QString::number(event.AbsoluteCount(event.Months()))),this);
+					break;
+				}
+				count=new QLabel(QString("%1 months until").arg(QString::number(event.AbsoluteCount(event.Months()))),this);
+				break;
+			}
+			case Units::YEARS:
+			{
+				qint64 years=event.Years();
+				if (years == 0)
+				{
+					count=new QLabel("Less than a year until",this);
+					break;
+				}
+				if (years < 0)
+				{
+					count=new QLabel(QString("%1 years since").arg(QString::number(event.AbsoluteCount(event.Years()))),this);
+					break;
+				}
+				count=new QLabel(QString("%1 years until").arg(QString::number(event.AbsoluteCount(event.Years()))),this);
+				break;
+			}
+			default:
+				throw std::logic_error("Unsupported unit encountered when constructing details block");
+		}
 		count->setStyleSheet("font-size: 20pt");
 		count->setAlignment(Qt::AlignCenter);
 		layout()->addWidget(count);

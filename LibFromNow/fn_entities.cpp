@@ -26,32 +26,58 @@ namespace FromNow
 		return date.daysTo(QDate::currentDate());
 	}
 
-	quint64 Event::Months() const
+	qint64 Event::Months() const
 	{
-		quint64 months=0;
+		qint64 months=0;
 		QDate today=QDate::currentDate();
-		while (date.month() != today.month() || date.year() != today.year())
+		if (today.daysTo(date) > 0)
 		{
-			today=today.addMonths(1);
-			months++;
+			while (date.month() != today.month() || date.year() != today.year())
+			{
+				today=today.addMonths(1);
+				months++;
+			}
+		}
+		else
+		{
+			while (date.month() != today.month() || date.year() != today.year())
+			{
+				today=today.addMonths(-1);
+				months--;
+			}
 		}
 		return months;
 	}
 
-	quint64 Event::AbsoluteDays() const
+	qint64 Event::Years() const
 	{
-		if (Days() < 0)
-			return static_cast<quint64>(Days() * -1);
+		qint64 years=0;
+		QDate today=QDate::currentDate();
+		if (today.daysTo(date) > 0)
+		{
+			while (date.year() != today.year())
+			{
+				today=today.addYears(1);
+				years++;
+			}
+		}
 		else
-			return static_cast<quint64>(Days());
+		{
+			while (date.year() != today.year())
+			{
+				today=today.addYears(-1);
+				years--;
+			}
+		}
+		return years;
 	}
 
-	QString Event::Detail() const
+	quint64 Event::AbsoluteCount(qint64 total) const
 	{
-		if (Days() < 0)
-			return QString("%1 days until (%2 months)").arg(QString::number(AbsoluteDays()),QString::number(Months()));
+		if (total < 0)
+			return static_cast<quint64>(total * -1);
 		else
-			return QString("%1 days since").arg(QString::number(AbsoluteDays()));
+			return static_cast<quint64>(total);
 	}
 
 	void Event::Edit(quint32 id,const QString &label)
@@ -154,7 +180,7 @@ namespace FromNow
 
 	const EventList& Event::Events()
 	{
-		std::sort(events.begin(),events.end(),[](const Event &left,const Event &right) { return left.AbsoluteDays() < right.AbsoluteDays(); });
+		std::sort(events.begin(),events.end(),[](const Event &left,const Event &right) { return left.AbsoluteCount(left.Days()) < right.AbsoluteCount(right.Days()); });
 		return events;
 	}
 }

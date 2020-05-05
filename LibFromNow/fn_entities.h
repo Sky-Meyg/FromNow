@@ -26,9 +26,9 @@ namespace FromNow
 		const QString& Label() const { return label; }
 		Units Unit() const { return unit; }
 		qint64 Days() const;
-		quint64 Months() const;
-		quint64 AbsoluteDays() const;
-		QString Detail() const;
+		qint64 Months() const;
+		qint64 Years() const;
+		quint64 AbsoluteCount(qint64 total) const;
 		static void Add(Event event) { events.push_back(event); }
 		static void Edit(quint32 id,const QString &label);
 		static void Edit(quint32 id,const Units unit);
