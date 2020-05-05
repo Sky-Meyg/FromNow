@@ -98,6 +98,22 @@ namespace FromNow
 		default:
 			throw std::logic_error("Unsupported units encountered when constructing unit block");
 		}
+
+		connect(days,&QRadioButton::toggled,[event](bool checked) {
+			if (!checked) return;
+			Event::Edit(event.ID(),Units::DAYS);
+			Event::Write();
+		});
+		connect(months,&QRadioButton::toggled,[event](bool checked) {
+			if (!checked) return;
+			Event::Edit(event.ID(),Units::MONTHS);
+			Event::Write();
+		});
+		connect(years,&QRadioButton::toggled,[event](bool checked) {
+			if (!checked) return;
+			Event::Edit(event.ID(),Units::YEARS);
+			Event::Write();
+		});
 	}
 
 	DateBlock::DateBlock(const Event &event,QWidget *parent) : QWidget(parent)

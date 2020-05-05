@@ -31,6 +31,7 @@ namespace FromNow
 		QString Detail() const;
 		static void Add(Event event) { events.push_back(event); }
 		static void Edit(quint32 id,const QString &label);
+		static void Edit(quint32 id,const Units unit);
 		static void Remove(Event &event);
 		static const EventList& Events();
 		static bool Open(QString location);

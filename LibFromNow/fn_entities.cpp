@@ -60,6 +60,12 @@ namespace FromNow
 		if (candidate != events.end()) candidate->label=label;
 	}
 
+	void Event::Edit(quint32 id,const Units unit)
+	{
+		EventIterator candidate=std::find_if(events.begin(),events.end(),[&id](Event &candidate) { return candidate.ID() == id; });
+		if (candidate != events.end()) candidate->unit=unit;
+	}
+
 	void Event::Remove(Event &event)
 	{
 		EventIteratorConst candidate=std::find_if(events.cbegin(),events.cend(),[&event](const Event &candidate) { return candidate.ID() == event.ID(); });
@@ -118,6 +124,20 @@ namespace FromNow
 			QJsonObject object;
 			object.insert(JSON_KEY_DATE,event.Date().toString(DATE_FORMAT));
 			object.insert(JSON_KEY_LABEL,event.Label());
+			switch (event.Unit())
+			{
+			case Units::DAYS:
+				object.insert(JSON_KEY_UNIT,JSON_UNIT_DAYS);
+				break;
+			case Units::MONTHS:
+				object.insert(JSON_KEY_UNIT,JSON_UNIT_MONTHS);
+				break;
+			case Units::YEARS:
+				object.insert(JSON_KEY_UNIT,JSON_UNIT_YEARS);
+				break;
+			default:
+				throw std::logic_error("Unsupported units encountered saving unit block");
+			}
 			objects.append(object);
 		}
 		json.setArray(objects);
