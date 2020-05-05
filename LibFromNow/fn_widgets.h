@@ -76,7 +76,7 @@ namespace FromNow
 	{
 		Q_OBJECT
 	public:
-		SecretEdit(QString initialText,QWidget *parent=nullptr);
+		SecretEdit(const QString &initialText,QWidget *parent=nullptr);
 		QString Text() const { return edit->text(); }
 	protected:
 		QPushButton *label;

@@ -119,7 +119,7 @@ namespace FromNow
 		layout()->addWidget(label);
 	}
 
-	SecretEdit::SecretEdit(QString initialText,QWidget *parent) : QWidget(parent)
+	SecretEdit::SecretEdit(const QString &initialText,QWidget *parent) : QWidget(parent)
 	{
 		setLayout(new QStackedLayout(this));
 		label=new QPushButton(initialText,this);
