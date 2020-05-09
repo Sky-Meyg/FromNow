@@ -1,7 +1,11 @@
 #include <QStandardPaths>
 #include <QJsonDocument>
 #include <QJsonArray>
+
+#if QT_VERSION >= QT_VERSION_CHECK(5, 10, 0)
 #include <QRandomGenerator>
+#endif
+
 #include "fn_entities.h"
 #include "fn_types.h"
 
@@ -15,7 +19,11 @@ namespace FromNow
 
 	Event::Event(QJsonObject data)
 	{
+#if QT_VERSION >= QT_VERSION_CHECK(5, 10, 0)
 		id=QRandomGenerator::global()->generate();
+#else
+		id=qrand();
+#endif
 		date=QDate::fromString(data.value(JSON_KEY_DATE).toString(),DATE_FORMAT);
 		label=data.value(JSON_KEY_LABEL).toString();
 		unit=unitMap.at(data.value(JSON_KEY_UNIT).toString());
