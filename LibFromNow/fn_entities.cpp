@@ -63,7 +63,8 @@ namespace FromNow
 		QDate today=QDate::currentDate();
 		if (today.daysTo(date) > 0)
 		{
-			while (date.year() != today.year())
+			today=today.addYears(1);
+			while (today < date)
 			{
 				today=today.addYears(1);
 				years++;
@@ -71,7 +72,8 @@ namespace FromNow
 		}
 		else
 		{
-			while (date.year() != today.year())
+			today=today.addYears(-1);
+			while (today > date)
 			{
 				today=today.addYears(-1);
 				years--;
