@@ -113,16 +113,14 @@ namespace FromNow
 		dataPath.setPath(location);
 		if (!dataPath.mkpath(dataPath.absolutePath()))
 		{
-			error=QString("Failed to create data storage path: %1").arg(dataPath.absolutePath());
-			cli << error;
+			OutputError(QString("Failed to create data storage path: %1").arg(dataPath.absolutePath()));
 			return false;
 		}
 
 		dataFile.setFileName(dataPath.filePath(DATA_FILE_NAME));
 		if (!dataFile.open(QIODevice::ReadWrite))
 		{
-			error=QString("Failed to open data storage file: %1").arg(dataFile.fileName());
-			cli << error;
+			OutputError(QString("Failed to open data storage file: %1").arg(dataFile.fileName()));
 			return false;
 		}
 
@@ -134,20 +132,32 @@ namespace FromNow
 		dataFile.close();
 	}
 
-	bool Event::Read()
+	bool Event::ReadAll()
 	{
-		QJsonParseError jsonError;
-		QByteArray data=dataFile.readAll();
-		if (data.isEmpty()) data="[]";
-		QJsonDocument json=QJsonDocument::fromJson(data,&jsonError);
-		if (json.isNull())
+		static const QString failedText("Failed to extract JSON from data file: %1");
+
+		try
 		{
-			error=QString("Failed to extract JSON from data file: %1").arg(jsonError.errorString());
-			cli << error;
+			QJsonParseError jsonError;
+			QByteArray data=dataFile.readAll();
+			if (data.isEmpty()) data="[]";
+			QJsonDocument json=QJsonDocument::fromJson(data,&jsonError);
+			if (json.isNull()) throw std::runtime_error(jsonError.errorString().toStdString());
+			for (const QJsonValue object : json.array()) FromNow::Event::Add(FromNow::Event(object.toObject()));
+		}
+
+		catch (std::runtime_error &exception)
+		{
+			OutputError(failedText.arg(exception.what()));
 			return false;
 		}
 
-		for (const QJsonValue object : json.array()) FromNow::Event::Add(FromNow::Event(object.toObject()));
+		catch (std::out_of_range &exception)
+		{
+			OutputError(failedText.arg(exception.what()));
+			return false;
+		}
+
 		return true;
 	}
 
@@ -181,11 +191,16 @@ namespace FromNow
 		dataFile.resize(0);
 		if (dataFile.write(json.toJson(QJsonDocument::Indented)) < 0)
 		{
-			error=QString("Failed to write JSON to data file");
-			cli << error;
+			OutputError("Failed to write JSON to data file");
 			return false;
 		}
 		return true;
+	}
+
+	void Event::OutputError(const QString &message)
+	{
+		error=message;
+		cli << error;
 	}
 
 	const EventList& Event::Events()

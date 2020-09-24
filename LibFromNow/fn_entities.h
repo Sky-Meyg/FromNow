@@ -36,7 +36,7 @@ namespace FromNow
 		static const EventList& Events();
 		static bool Open(QString location);
 		static void Close();
-		static bool Read();
+		static bool ReadAll();
 		static bool Write();
 		static const QString& LastError() { return error; }
 	protected:
@@ -49,6 +49,7 @@ namespace FromNow
 		static QFile dataFile;
 		static QTextStream cli;
 		static QString error;
+		static void OutputError(const QString &message);
 	};
 }
 

@@ -21,7 +21,7 @@ MainWindow::MainWindow(QWidget *parent)	: QMainWindow(parent), viewport(nullptr)
 		emit Exit(FILE_ERROR);
 	}
 
-	if (!FromNow::Event::Read())
+	if (!FromNow::Event::ReadAll())
 	{
 		(new QMessageBox(QMessageBox::Critical,ERROR_CRITICAL,FromNow::Event::LastError(),QMessageBox::Ok,this))->exec();
 		emit Exit(PARSE_ERROR);
