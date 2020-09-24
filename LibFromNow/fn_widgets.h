@@ -75,6 +75,19 @@ namespace FromNow
 		void Changed(Units unit);
 	};
 
+	/*!
+	 * \class ExplicitPushButton
+	 * \brief QPushButton with a label that doesn't interpret ampersands
+	 */
+	class LIBFROMNOWSHARED_EXPORT ExplicitPushButton : public QPushButton
+	{
+	public:
+		ExplicitPushButton(const QString &text,QWidget *parent=nullptr) : QPushButton(stripShortcut(text),parent) { }
+		void setText(const QString &text) { QPushButton::setText(stripShortcut(text)); }
+	protected:
+		QString stripShortcut(const QString &text) { return QString(text).replace("&","&&"); }
+	};
+
 	class LIBFROMNOWSHARED_EXPORT SecretEdit : public QWidget
 	{
 		Q_OBJECT
@@ -82,7 +95,7 @@ namespace FromNow
 		SecretEdit(const QString &initialText,QWidget *parent=nullptr);
 		QString Text() const { return edit->text(); }
 	protected:
-		QPushButton *label;
+		ExplicitPushButton *label;
 		QLineEdit *edit;
 	signals:
 		void Edited(const QString label);

@@ -206,7 +206,7 @@ namespace FromNow
 	SecretEdit::SecretEdit(const QString &initialText,QWidget *parent) : QWidget(parent)
 	{
 		setLayout(new QStackedLayout(this));
-		label=new QPushButton(initialText,this);
+		label=new ExplicitPushButton(initialText,this);
 		label->setFlat(true);
 		connect(label,&QPushButton::clicked,[this]() { static_cast<QStackedLayout*>(layout())->setCurrentIndex(1); });
 		layout()->addWidget(label);
