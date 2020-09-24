@@ -88,6 +88,10 @@ namespace FromNow
 		QString stripShortcut(const QString &text) { return QString(text).replace("&","&&"); }
 	};
 
+	/*!
+	 * \class SecretEdit
+	 * \brief QPushButton that becomes a QLineEdit when clicked, allowing you to change the text
+	 */
 	class LIBFROMNOWSHARED_EXPORT SecretEdit : public QWidget
 	{
 		Q_OBJECT
