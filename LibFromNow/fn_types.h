@@ -23,7 +23,7 @@ namespace FromNow
 		MONTHS,
 		YEARS
 	};
-	typedef std::map<QString,Units> UnitMap;
+	using UnitMap=std::map<QString,Units>;
 	const UnitMap unitMap={
 		{JSON_UNIT_DAYS,Units::DAYS},
 		{JSON_UNIT_MONTHS,Units::MONTHS},

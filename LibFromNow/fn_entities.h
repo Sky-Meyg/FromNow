@@ -12,9 +12,9 @@
 namespace FromNow
 {
 	class LIBFROMNOWSHARED_EXPORT Event;
-	typedef std::vector<Event> EventList;
-	typedef std::vector<Event>::iterator EventIterator;
-	typedef std::vector<Event>::const_iterator EventIteratorConst;
+	using EventList=std::vector<Event>;
+	using EventIterator=std::vector<Event>::iterator;
+	using EventIteratorConst=std::vector<Event>::const_iterator;
 
 	class LIBFROMNOWSHARED_EXPORT Event
 	{
