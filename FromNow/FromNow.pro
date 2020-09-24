@@ -1,7 +1,7 @@
 QT += core gui widgets
 TARGET = fromnow
 TEMPLATE = app
-CONFIG += c++11
+CONFIG += c++17
 
 SOURCES += \
 	main.cpp \

@@ -1,4 +1,3 @@
-#include <QStandardPaths>
 #include <QJsonDocument>
 #include <QJsonArray>
 #include <QJsonObject>
@@ -11,23 +10,9 @@
 
 #include <QDebug>
 
-MainWindow::MainWindow(QWidget *parent)	: QMainWindow(parent), viewport(nullptr)
+MainWindow::MainWindow(QWidget *parent)	: QMainWindow(parent), viewport(nullptr), eventFile(nullptr)
 {
 	connect(this,&MainWindow::Exit,qApp,&QCoreApplication::exit,Qt::QueuedConnection);
-
-	if (!FromNow::Event::Open(QStandardPaths::writableLocation(QStandardPaths::AppDataLocation)))
-	{
-		(new QMessageBox(QMessageBox::Critical,ERROR_CRITICAL,FromNow::Event::LastError(),QMessageBox::Ok,this))->exec();
-		emit Exit(FILE_ERROR);
-	}
-
-	if (!FromNow::Event::ReadAll())
-	{
-		(new QMessageBox(QMessageBox::Critical,ERROR_CRITICAL,FromNow::Event::LastError(),QMessageBox::Ok,this))->exec();
-		emit Exit(PARSE_ERROR);
-	}
-
-	RefreshEvents();
 
 	createBar=new FromNow::CreateBar(this);
 	connect(createBar,&FromNow::CreateBar::Add,this,&MainWindow::EventAdded);
@@ -36,13 +21,33 @@ MainWindow::MainWindow(QWidget *parent)	: QMainWindow(parent), viewport(nullptr)
 
 MainWindow::~MainWindow()
 {
-	FromNow::Event::Close();
+	if (eventFile) delete eventFile;
+}
+
+bool MainWindow::event(QEvent *event)
+{
+	if (event->type() == QEvent::Polish)
+	{
+		try
+		{
+			eventFile=new FromNow::EventFile();
+			RefreshEvents();
+		}
+
+		catch (std::runtime_error &exception)
+		{
+			(new QMessageBox(QMessageBox::Critical,ERROR_CRITICAL,eventFile->LastError(),QMessageBox::Ok,this))->exec();
+			return false;
+		}
+	}
+
+	return QWidget::event(event);
 }
 
 void MainWindow::RefreshEvents()
 {
 	try {
-		viewport=new FromNow::ContentView(this); // not sure if this is a memory leak or not in Qt parent-owner-deleteLater-craziness framework
+		viewport=new FromNow::ContentView(eventFile->Events(),this); // not sure if this is a memory leak or not in Qt parent-owner-deleteLater-craziness framework
 		connect(viewport,&FromNow::ContentView::Remove,this,&MainWindow::EventRemoved);
 		setCentralWidget(viewport);
 	}
@@ -60,17 +65,12 @@ void MainWindow::RefreshEvents()
 
 void MainWindow::EventAdded(FromNow::Event event)
 {
-	if (!FromNow::Event::Write())
-	{
-		(new QMessageBox(QMessageBox::Critical,ERROR_CRITICAL,"Failed to write to data file",QMessageBox::Ok,this))->exec();
-		return;
-	}
+	eventFile->Add(event);
 	RefreshEvents();
 }
 
-void MainWindow::EventRemoved(FromNow::Event event)
+void MainWindow::EventRemoved(const std::unique_ptr<FromNow::Event> &event)
 {
-	FromNow::Event::Remove(event);
-	FromNow::Event::Write();
+	eventFile->Remove(event);
 	RefreshEvents();
 }

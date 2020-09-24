@@ -38,18 +38,17 @@ namespace FromNow
 	void CreateBar::AddClicked()
 	{
 		Event event(calendar->selectedDate(),label->toPlainText(),Units::DAYS);
-		Event::Add(event);
 		emit Add(event);
 		label->clear();
 	}
 
-	ContentView::ContentView(QWidget *parent) : QScrollArea(parent), content(nullptr)
+	ContentView::ContentView(EventList &events,QWidget *parent) : QScrollArea(parent), content(nullptr)
 	{
 		setWidgetResizable(true);
 		content=new QFrame(this);
 		content->setLayout(new QVBoxLayout(content));
 		content->setSizePolicy(QSizePolicy(QSizePolicy::MinimumExpanding,QSizePolicy::Fixed));
-		for (const Event &event : Event::Events())
+		for (std::unique_ptr<Event> &event : events)
 		{
 			EventBlock *eventBlock=new EventBlock(event,content);
 			connect(eventBlock,&EventBlock::Remove,this,&ContentView::Remove);
@@ -58,7 +57,7 @@ namespace FromNow
 		setWidget(content);
 	}
 
-	EventBlock::EventBlock(const Event &event,QWidget *parent) : QWidget(parent)
+	EventBlock::EventBlock(std::unique_ptr<Event> &event,QWidget *parent) : QWidget(parent)
 	{
 		setSizePolicy(QSizePolicy(QSizePolicy::MinimumExpanding,QSizePolicy::Fixed));
 		setLayout(new QHBoxLayout(this));
@@ -69,11 +68,11 @@ namespace FromNow
 		layout()->addWidget(detailsBlock);
 		connect(unitBlock,&UnitBlock::Changed,detailsBlock,&DetailsBlock::UnitChanged);
 		remove=new QPushButton("Remove",this);
-		connect(remove,&QPushButton::clicked,[this,event]() { emit Remove(event); });
+		connect(remove,&QPushButton::clicked,[this,&event]() { emit Remove(event); });
 		layout()->addWidget(remove);
 	}
 
-	UnitBlock::UnitBlock(const Event &event,QWidget *parent) : QWidget(parent)
+	UnitBlock::UnitBlock(std::unique_ptr<Event> &event,QWidget *parent) : QWidget(parent)
 	{
 		setSizePolicy(QSizePolicy(QSizePolicy::Fixed,QSizePolicy::Fixed));
 		setLayout(new QGridLayout(this));
@@ -87,7 +86,7 @@ namespace FromNow
 		groupBox->layout()->addWidget(years);
 		layout()->addWidget(groupBox);
 
-		switch (event.Unit())
+		switch (event->Unit())
 		{
 		case Units::DAYS:
 			days->setChecked(true);
@@ -102,45 +101,42 @@ namespace FromNow
 			throw std::logic_error("Unsupported units encountered when constructing unit block");
 		}
 
-		connect(days,&QRadioButton::toggled,[this,eventID=event.ID()](bool checked) {
+		connect(days,&QRadioButton::toggled,[this,&event](bool checked) {
 			if (!checked) return;
-			Event::Edit(eventID,Units::DAYS);
-			Event::Write();
+			event->Unit(Units::DAYS);
 			emit Changed(Units::DAYS);
 		});
-		connect(months,&QRadioButton::toggled,[this,eventID=event.ID()](bool checked) {
+		connect(months,&QRadioButton::toggled,[this,&event](bool checked) {
 			if (!checked) return;
-			Event::Edit(eventID,Units::MONTHS);
-			Event::Write();
+			event->Unit(Units::MONTHS);
 			emit Changed(Units::MONTHS);
 		});
-		connect(years,&QRadioButton::toggled,[this,eventID=event.ID()](bool checked) {
+		connect(years,&QRadioButton::toggled,[this,&event](bool checked) {
 			if (!checked) return;
-			Event::Edit(eventID,Units::YEARS);
-			Event::Write();
+			event->Unit(Units::YEARS);
 			emit Changed(Units::YEARS);
 		});
 	}
 
-	DateBlock::DateBlock(const Event &event,QWidget *parent) : QWidget(parent)
+	DateBlock::DateBlock(const std::unique_ptr<Event> &event,QWidget *parent) : QWidget(parent)
 	{
 		setSizePolicy(QSizePolicy(QSizePolicy::Fixed,QSizePolicy::Fixed));
 		setLayout(new QVBoxLayout(this));
-		month=new QLabel(QDate::shortMonthName(event.Date().month()),this);
+		month=new QLabel(QDate::shortMonthName(event->Date().month()),this);
 		month->setStyleSheet("font-size: 14pt");
 		month->setAlignment(Qt::AlignCenter);
 		layout()->addWidget(month);
-		day=new QLabel(QString::number(event.Date().day()),this);
+		day=new QLabel(QString::number(event->Date().day()),this);
 		day->setStyleSheet("font-size: 18pt");
 		day->setAlignment(Qt::AlignCenter);
 		layout()->addWidget(day);
-		year=new QLabel(QString::number(event.Date().year()),this);
+		year=new QLabel(QString::number(event->Date().year()),this);
 		year->setStyleSheet("font-size: 12pt");
 		year->setAlignment(Qt::AlignCenter);
 		layout()->addWidget(year);
 	}
 
-	DetailsBlock::DetailsBlock(const Event &event,QWidget *parent) : QWidget(parent)
+	DetailsBlock::DetailsBlock(std::unique_ptr<Event> &event,QWidget *parent) : QWidget(parent)
 	{
 		PrepareDescriptions(event);
 		setSizePolicy(QSizePolicy(QSizePolicy::MinimumExpanding,QSizePolicy::Fixed));
@@ -148,50 +144,47 @@ namespace FromNow
 		count=new QLabel(this);
 		count->setStyleSheet("font-size: 20pt");
 		count->setAlignment(Qt::AlignCenter);
-		UnitChanged(event.Unit());
+		UnitChanged(event->Unit());
 		layout()->addWidget(count);
-		label=new SecretEdit(event.Label(),this);
-		connect(label,&SecretEdit::Edited,[event](const QString label) {
-			Event::Edit(event.ID(),label);
-			Event::Write();
-		});
+		label=new SecretEdit(event->Label(),this);
+		connect(label,&SecretEdit::Edited,[&event](const QString label) { event->Label(label); });
 		layout()->addWidget(label);
 	}
 
-	const QString DetailsBlock::DaysDescription(const Event &event) const
+	const QString DetailsBlock::DaysDescription(const std::unique_ptr<Event> &event) const
 	{
-		if (event.Days() == 0) return "Today!";
-		if (event.Days() < 0)
-			return QString("%1 days since").arg(QString::number(event.AbsoluteCount(event.Days())));
+		if (event->Days() == 0) return "Today!";
+		if (event->Days() < 0)
+			return QString("%1 days since").arg(QString::number(event->AbsoluteCount(event->Days())));
 		else
-			return QString("%1 days until").arg(QString::number(event.AbsoluteCount(event.Days())));
+			return QString("%1 days until").arg(QString::number(event->AbsoluteCount(event->Days())));
 	}
 
-	const QString DetailsBlock::MonthsDescription(const Event &event) const
+	const QString DetailsBlock::MonthsDescription(const std::unique_ptr<Event> &event) const
 	{
-		bool partial=event.AbsoluteCount(event.Days()) < static_cast<quint64>(QDate::currentDate().daysInMonth());
-		if (event.Days() < 0)
+		bool partial=event->AbsoluteCount(event->Days()) < static_cast<quint64>(QDate::currentDate().daysInMonth());
+		if (event->Days() < 0)
 		{
 			if (partial) return "Less than a month since";
-			return QString("%1 months since").arg(QString::number(event.AbsoluteCount(event.Months())));
+			return QString("%1 months since").arg(QString::number(event->AbsoluteCount(event->Months())));
 		}
 		if (partial) return "Less than a month until";
-		return QString("%1 months until").arg(QString::number(event.AbsoluteCount(event.Months())));
+		return QString("%1 months until").arg(QString::number(event->AbsoluteCount(event->Months())));
 	}
 
-	const QString DetailsBlock::YearsDescription(const Event &event) const
+	const QString DetailsBlock::YearsDescription(const std::unique_ptr<Event> &event) const
 	{
-		bool partial=event.AbsoluteCount(event.Days()) < static_cast<quint64>(QDate::currentDate().daysInYear());
-		if (event.Days() < 0)
+		bool partial=event->AbsoluteCount(event->Days()) < static_cast<quint64>(QDate::currentDate().daysInYear());
+		if (event->Days() < 0)
 		{
 			if (partial) return "Less than a year since";
-			return QString("%1 years since").arg(QString::number(event.AbsoluteCount(event.Years())));
+			return QString("%1 years since").arg(QString::number(event->AbsoluteCount(event->Years())));
 		}
 		if (partial) return "Less than a year until";
-		return QString("%1 years until").arg(QString::number(event.AbsoluteCount(event.Years())));
+		return QString("%1 years until").arg(QString::number(event->AbsoluteCount(event->Years())));
 	}
 
-	void DetailsBlock::PrepareDescriptions(const Event &event)
+	void DetailsBlock::PrepareDescriptions(const std::unique_ptr<Event> &event)
 	{
 		descriptions.insert({Units::DAYS,DaysDescription(event)});
 		descriptions.insert({Units::MONTHS,MonthsDescription(event)});

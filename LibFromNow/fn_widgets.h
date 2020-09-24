@@ -34,28 +34,28 @@ namespace FromNow
 	{
 		Q_OBJECT
 	public:
-		ContentView(QWidget *parent=nullptr);
+		ContentView(EventList &events,QWidget *parent=nullptr);
 	protected:
 		QFrame *content;
 	signals:
-		void Remove(Event event);
+		void Remove(const std::unique_ptr<Event> &event);
 	};
 
 	class LIBFROMNOWSHARED_EXPORT EventBlock : public QWidget
 	{
 		Q_OBJECT
 	public:
-		EventBlock(const Event &event,QWidget *parent=nullptr);
+		EventBlock(std::unique_ptr<Event> &event,QWidget *parent=nullptr);
 	protected:
 		QPushButton *remove;
 	signals:
-		void Remove(Event event);
+		void Remove(const std::unique_ptr<Event> &event);
 	};
 
 	class LIBFROMNOWSHARED_EXPORT DateBlock : public QWidget
 	{
 	public:
-		DateBlock(const Event &event,QWidget *parent=nullptr);
+		DateBlock(const std::unique_ptr<Event> &event,QWidget *parent=nullptr);
 	protected:
 		QLabel *month;
 		QLabel *day;
@@ -66,7 +66,7 @@ namespace FromNow
 	{
 		Q_OBJECT
 	public:
-		UnitBlock(const Event &event,QWidget *parent=nullptr);
+		UnitBlock(std::unique_ptr<Event> &event,QWidget *parent=nullptr);
 	protected:
 		QRadioButton *days;
 		QRadioButton *months;
@@ -109,16 +109,16 @@ namespace FromNow
 	{
 		Q_OBJECT
 	public:
-		DetailsBlock(const Event &event,QWidget *parent=nullptr);
+		DetailsBlock(std::unique_ptr<Event> &event,QWidget *parent=nullptr);
 		const QString DescribeRange(Units unit) const;
 	protected:
 		QLabel *count;
 		SecretEdit *label;
 		std::map<Units,QString> descriptions;
-		const QString DaysDescription(const Event &event) const;
-		const QString MonthsDescription(const Event &event) const;
-		const QString YearsDescription(const Event &event) const;
-		void PrepareDescriptions(const Event &event);
+		const QString DaysDescription(const std::unique_ptr<Event> &event) const;
+		const QString MonthsDescription(const std::unique_ptr<Event> &event) const;
+		const QString YearsDescription(const std::unique_ptr<Event> &event) const;
+		void PrepareDescriptions(const std::unique_ptr<Event> &event);
 	signals:
 		void Edit(Event event);
 	public slots:

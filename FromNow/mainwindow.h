@@ -15,11 +15,13 @@ public:
 protected:
 	FromNow::CreateBar *createBar;
 	FromNow::ContentView *viewport;
+	FromNow::EventFile *eventFile;
+	bool event(QEvent *event) override;
 	void RefreshEvents();
 signals:
 	void Exit(int code);
 protected slots:
 	void EventAdded(FromNow::Event event);
-	void EventRemoved(FromNow::Event event);
+	void EventRemoved(const std::unique_ptr<FromNow::Event> &event);
 };
 

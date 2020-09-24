@@ -2,6 +2,7 @@ QT += gui widgets
 TARGET = fromnow
 TEMPLATE = lib
 DEFINES += LIBFROMNOW_LIBRARY
+CONFIG += c++17
 
 SOURCES += \
 	fn_widgets.cpp \
