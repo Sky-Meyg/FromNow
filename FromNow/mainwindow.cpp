@@ -60,7 +60,11 @@ void MainWindow::RefreshEvents()
 
 void MainWindow::EventAdded(FromNow::Event event)
 {
-	FromNow::Event::Write();
+	if (!FromNow::Event::Write())
+	{
+		(new QMessageBox(QMessageBox::Critical,ERROR_CRITICAL,"Failed to write to data file",QMessageBox::Ok,this))->exec();
+		return;
+	}
 	RefreshEvents();
 }
 
