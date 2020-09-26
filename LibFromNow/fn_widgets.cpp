@@ -9,6 +9,7 @@ namespace FromNow
 	CreateBar::CreateBar(QWidget *parent) : QToolBar(parent)
 	{
 		calendar=new QCalendarWidget(this);
+		calendar->setStyleSheet("QWidget#qt_calendar_navigationbar { background: palette(window); }");
 		calendar->setSizePolicy(QSizePolicy(QSizePolicy::Fixed,QSizePolicy::Fixed));
 		addWidget(calendar);
 		QFrame *container=new QFrame(this);
