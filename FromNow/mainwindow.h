@@ -3,6 +3,8 @@
 #include <QMainWindow>
 #include <QFile>
 #include <QDir>
+#include <memory>
+#include <functional>
 #include "fn_entities.h"
 #include "fn_widgets.h"
 
@@ -14,7 +16,7 @@ public:
 	~MainWindow();
 protected:
 	FromNow::CreateBar *createBar;
-	FromNow::ContentView *viewport;
+	std::unique_ptr<FromNow::ContentView,std::function<void(FromNow::ContentView*)>> viewport;
 	FromNow::EventFile *eventFile;
 	bool event(QEvent *event) override;
 	void RefreshEvents();
