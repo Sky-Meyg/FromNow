@@ -9,6 +9,7 @@ namespace FromNow
 {
 	CreateBar::CreateBar(QWidget *parent) : QToolBar(parent)
 	{
+		this->setContextMenuPolicy(Qt::PreventContextMenu);
 		calendar=new QCalendarWidget(this);
 		calendar->setStyleSheet("QWidget#qt_calendar_navigationbar { background: palette(window); }");
 		calendar->setSizePolicy(QSizePolicy(QSizePolicy::Fixed,QSizePolicy::Fixed));
