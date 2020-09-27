@@ -1,2 +1,13 @@
 *.pro.user*
+*.dll
+*.lib
+*.exp
+*.obj
+moc_*
+*.vcxproj.*
+.qmake.stash
+.vs/
 build/
+x64/
+debug/
+release/
