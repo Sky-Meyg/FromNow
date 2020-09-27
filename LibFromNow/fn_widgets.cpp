@@ -2,6 +2,7 @@
 #include <QStackedLayout>
 #include <QFrame>
 #include <QGroupBox>
+#include <stdexcept>
 #include "fn_widgets.h"
 
 namespace FromNow

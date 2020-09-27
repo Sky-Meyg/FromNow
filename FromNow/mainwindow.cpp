@@ -5,6 +5,7 @@
 #include <QVBoxLayout>
 #include <QCoreApplication>
 #include <QMessageBox>
+#include <stdexcept>
 #include "mainwindow.h"
 #include "types.h"
 
