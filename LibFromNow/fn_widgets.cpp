@@ -11,7 +11,7 @@ namespace FromNow
 	{
 		this->setContextMenuPolicy(Qt::PreventContextMenu);
 		calendar=new QCalendarWidget(this);
-		calendar->setStyleSheet("#qt_calendar_navigationbar { background: palette(window); } #qt_calendar_monthbutton, #qt_calendar_yearbutton { color: palette(text); }");
+		calendar->setStyleSheet("#qt_calendar_navigationbar { background: palette(window); } #qt_calendar_monthbutton, #qt_calendar_yearbutton { color: palette(text); } #qt_calendar_prevmonth, #qt_calendar_nextmonth { qproperty-icon:url();  } #qt_calendar_prevmonth { qproperty-text: '◄' } #qt_calendar_nextmonth { qproperty-text: '►' }");
 		calendar->setSizePolicy(QSizePolicy(QSizePolicy::Fixed,QSizePolicy::Fixed));
 		addWidget(calendar);
 		QFrame *container=new QFrame(this);
