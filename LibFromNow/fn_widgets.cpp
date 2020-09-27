@@ -11,7 +11,7 @@ namespace FromNow
 	{
 		this->setContextMenuPolicy(Qt::PreventContextMenu);
 		calendar=new QCalendarWidget(this);
-		calendar->setStyleSheet("QWidget#qt_calendar_navigationbar { background: palette(window); }");
+		calendar->setStyleSheet("#qt_calendar_navigationbar { background: palette(window); } #qt_calendar_monthbutton, #qt_calendar_yearbutton { color: palette(text); }");
 		calendar->setSizePolicy(QSizePolicy(QSizePolicy::Fixed,QSizePolicy::Fixed));
 		addWidget(calendar);
 		QFrame *container=new QFrame(this);
